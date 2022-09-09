@@ -1,0 +1,138 @@
+크리쳐가 최상위 <- 몬스터, 캐릭터 상속
+
+캐릭터라는 인터페이스(혹은 추상클래스) > 전사, 도적, 법사 상속받도록
+
+entity.Monster 클래스)
+getDamage() - 캐릭터의 스킬 혹은 평타로 인해 데미지를 입음
+
+캐릭터 추상클래스) -> 이것도 쪼개야 할까 (캐릭터 정보 클래스 + 캐릭터 능력 클래스 + 캐릭터 상태변경 클래스)
+
+String name
+job.ClassCategory classCategory (전사 도적 법사 - enum??)
+Position position (위치 얘기하는 거임. 좌표요.)
+int level
+int exp (각 레벨에 필요한 경험치가 상수로 있어야 함)
+int hp
+play.Weapon item (sword, wand, bow클래스는 play.Weapon 클래스를 상속받는다)
+Status(Enum) status = 배틀중, 필드 이동 중
+HashMap<능력치enum, int> ability (List? str, dex, int)
+HashMap<스킬enum(q,w), int> skillCooltime (hashmap? 디폴트 q-0, w-0)
+List<>inventory (인벤토리는 4칸으로 고정 ..)
+play.Skill skill (play.Skill )
+
+move()
+autoAttack() - 평타
+useQSkill()
+useWSkill()
+startBattle() - 필드 이동 중 몹을 마주쳤을 때
+endBattle() - 몹을 물리쳤을 때, 혹은 캐릭터가 죽었을 때
+getExp()
+openInventory()
+
+평타 설정
+무기의 damage 따라 간다
+
+스킬 설정??
+버프: 몇 턴 동안 버프를 부여할 것이고, 버프가 끝난 뒤에는 어떻게 초기화 시킬 지
+전사 - 걍 쎔
+level1 > 파워 스트라이크
+level2 > 피의 갈망 (본인 체력 깎아서 힘뻥)
+
+법사 - 독뎀?? (중첩 가능??)
+level1 > 포이즌 블로우
+level2 > 저주 (디버프)
+
+궁수 - 화살 크리뎀 (기본 20% 확률)
+level1 > 더블애로우 (화살 두발 발사)
+level2 > 민첩한 몸놀림 (스킬 크리 확률 3배로 증가 >> 60%)
+
+콘솔 출력 메세지용 객체는 따로 만들어야 할 듯 (무조건 따로 .. 시나리오별로 상황에 맞는 대사 출력되도록)
+
+battle.BattleInfo 클래스 - 필요 없으려나)
+round - 턴제니까 1라운드, 2라운드 ..
+character - 캐릭터
+monster - 몹
+turn (현재 공격을 고민하고 있는 대상?)
+
+item.Item 추상클래스)
+
+boolean isWearable;
+boolean isUseable;
+int weight;
+String name;
+String description;
+
+play.Weapon 추상클래스 extends item.Item)
+int damage
+ability
+target (검은 전사만, 활은 궁수만, 지팡이는 법사만)
+
+item.Sword extends play.Weapon)
+target = job.Warrior
+HashMap<능력치enum, int> ability (List? str, dex, int)
+
+Map 클래스)
+size (사이즈가 10이면 정사각형으로 10*10)
+obstacles List<Wall>
+
+Obstacle 추상클래스)
+String name;
+int xPos;
+int yPos;
+
+breakableTile 클래스 extends Obstacle implements Breakable
+unbreakableTile 클래스 extends Obstacle implements Unbreakble
+
+
+
+play.Skill 추상클래스(클래스)
+
+entity.Character command (qwer 얘기하는 거)
+qualifedClass (스킬사용 가능 직업군)
+int qualifiedLevel (스킬 사용 가능한 필요 레벨)
+String description (스킬 설명)
+entity.Creature target (스킬 사용대상)
+Type type (어택 / 버프 / 디버프)
+int cooltime
+
+void effect() {
+  // powerStrike
+  // 파워스트라이크 모션
+  skillType.doAttack(target)
+}
+
+void effect() {
+  // Thirst For Blood
+  // 피의 갈망 모션
+  Ability ability = new Ability(10, 0, 0); - 빌더패턴?
+  skillType.doStatBuff(Ability);
+}
+
+SkillType (이넘클래스??)
+enum {buff, debuff, attack}
+
+AttackType 클래스
+doAttack(Target target) {
+  int damage = DamageStrategy.calculateDamageAtype();
+  target.getDamage(damage);
+}
+
+BuffType 클래스
+doStatBuff(Target target) {
+  target.getBuff();
+}
+
+BattleStrategy -> Damage전략, Buff전략, Debuff전략
+
+BattleAction enum - 싸운다, 도망친다
+
+로그를 어떻게 쌓을지 고민 (메모장 모션 불러오면 계속 콘솔 지워지니까)
+방어도 개념
+
+
+== catch문에서 로직 재실행 피드백 ==
+머드게임 - 외부에서 파라미터를 받아올 수 있게끔
+아니면 getInstance 생성자로 받아올 때
+
+쿨타임 에러 수정하기
+-> 배틀턴 지날 때마다 쿨타임 하나씩 줄어들게끔 로직 작성 필요
